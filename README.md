@@ -25,4 +25,21 @@ CommercialOps Control Tower will be a small ERP-style monitoring system that bri
 5. Create recommendations from the detected issues.
 6. Display KPIs, validation results, and recommendations in Streamlit.
 
-Phase 0 contains only the project scaffold. Business logic and sample data will be added in a later phase.
+## Current Phase 1 features
+
+- A deterministic Excel workbook with five commercial operations datasets
+- Realistic sample records with a small number of deliberate data issues
+- A reusable data loader that checks for all required worksheets
+- A Streamlit view with record counts and expandable data previews
+
+Validation rules, business KPIs, and recommendations are intentionally reserved for later phases.
+
+## Run the project
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+python scripts/generate_sample_data.py
+streamlit run app.py
+```
