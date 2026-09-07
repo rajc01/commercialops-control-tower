@@ -18,8 +18,8 @@ CommercialOps Control Tower will be a small ERP-style monitoring system that bri
 
 ## Planned data flow
 
-1. Generate sample customer, order, invoice, payment, and project data as Excel files.
-2. Load the files into Pandas DataFrames.
+1. Generate one Excel workbook containing five worksheets for customer, order, invoice, payment, and project data.
+2. Load the five worksheets into Pandas DataFrames.
 3. Validate data quality and reconcile related records.
 4. Calculate commercial operations KPIs.
 5. Create recommendations from the detected issues.

@@ -85,7 +85,7 @@ def create_sample_data() -> dict[str, pd.DataFrame]:
             ["INV-016", "ORD-016", "2026-06-30", "2026-07-30", 67000, "Overdue"],
             ["INV-017", "ORD-017", "2026-07-07", "2026-08-06", 26000, "Paid"],
             ["INV-018", "ORD-018", "2026-07-15", "2026-08-14", 39000, "Paid"],
-            ["INV-019", "ORD-019", "2026-08-02", "2026-09-01", 52000, "Unpaid"],
+            ["INV-019", "ORD-019", "2026-08-02", "2026-09-30", 52000, "Unpaid"],
             ["INV-020", "ORD-999", "2026-08-20", "2026-09-19", 17500, "Unpaid"],
         ],
         columns=["invoice_id", "order_id", "invoice_date", "due_date", "invoice_amount", "status"],
@@ -104,12 +104,12 @@ def create_sample_data() -> dict[str, pd.DataFrame]:
             ["PAY-006", "INV-007", "2026-04-27", 28500, "Bank Transfer"],
             ["PAY-007", "INV-008", "2026-05-04", 40000, "Bank Transfer"],
             ["PAY-008", "INV-008", "2026-06-02", 10000, "Bank Transfer"],
-            ["PAY-009", "INV-009", "2026-05-17", 54000, "ACH"],
-            ["PAY-010", "INV-011", "2026-06-04", 48000, "ACH"],
+            ["PAY-009", "INV-009", "2026-05-17", 54000, "NEFT"],
+            ["PAY-010", "INV-011", "2026-06-04", 48000, "NEFT"],
             ["PAY-011", "INV-013", "2026-06-29", 88000, "Bank Transfer"],
             ["PAY-012", "INV-014", "2026-07-08", 31000, "Credit Card"],
             ["PAY-013", "INV-015", "2026-07-15", 5000, "Credit Card"],
-            ["PAY-014", "INV-017", "2026-08-02", 26000, "ACH"],
+            ["PAY-014", "INV-017", "2026-08-02", 26000, "NEFT"],
             ["PAY-015", "INV-018", "2026-08-10", 39000, "Bank Transfer"],
         ],
         columns=["payment_id", "invoice_id", "payment_date", "payment_amount", "payment_method"],
@@ -174,7 +174,7 @@ def format_workbook(path: Path) -> None:
                 min_col=headers[header], max_col=headers[header], min_row=2
             ):
                 for item in cell:
-                    item.number_format = '"$"#,##0.00'
+                    item.number_format = '"₹"#,##0.00'
 
         for header in date_columns.get(worksheet.title, set()):
             for cell in worksheet.iter_cols(
