@@ -1,4 +1,4 @@
-"""Display the CommercialOps Control Tower Streamlit dashboard."""
+"""Display the OpsTower Streamlit dashboard."""
 
 from pathlib import Path
 
@@ -21,8 +21,8 @@ def format_inr(value: float | int) -> str:
     return f"₹{value:,.0f}"
 
 
-st.set_page_config(page_title="CommercialOps Control Tower", layout="wide")
-st.title("CommercialOps Control Tower")
+st.set_page_config(page_title="OpsTower", layout="wide")
+st.title("OpsTower")
 st.subheader(
     "ERP-style monitoring for commercial operations, reconciliation and exception management"
 )

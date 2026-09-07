@@ -1,1 +1,1 @@
-"""Provide the core modules for the CommercialOps Control Tower."""
+"""Provide the core modules for OpsTower."""

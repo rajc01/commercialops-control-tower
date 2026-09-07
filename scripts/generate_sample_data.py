@@ -1,4 +1,4 @@
-"""Generate deterministic sample data for the CommercialOps Control Tower."""
+"""Generate deterministic sample data for OpsTower."""
 
 from pathlib import Path
 
