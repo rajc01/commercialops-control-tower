@@ -25,7 +25,7 @@ CommercialOps Control Tower will be a small ERP-style monitoring system that bri
 5. Create recommendations from the detected issues.
 6. Display KPIs, validation results, and recommendations in Streamlit.
 
-## Current Phase 3 features
+## Current Phase 4 features
 
 - A deterministic Excel workbook with five commercial operations datasets
 - Realistic sample records with a small number of deliberate data issues
@@ -33,8 +33,9 @@ CommercialOps Control Tower will be a small ERP-style monitoring system that bri
 - A Streamlit view with record counts and expandable data previews
 - A standardized validation and reconciliation engine for operational exceptions
 - Business KPIs for data quality, receivables, revenue at risk, and issue severity
+- A Streamlit dashboard for KPIs, exceptions, receivables, projects, and source data
 
-Recommendations and dashboard enhancements are intentionally reserved for later phases.
+Automated recommendations are intentionally reserved for a later phase.
 
 ## Run the project
 

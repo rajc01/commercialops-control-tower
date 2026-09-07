@@ -31,7 +31,11 @@ def calculate_invoice_balances(
     invoices: pd.DataFrame, payments: pd.DataFrame
 ) -> pd.DataFrame:
     """Return invoice amounts, payments received, and outstanding balances."""
-    balances = invoices[["invoice_id", "invoice_amount", "due_date"]].copy()
+    invoice_columns = ["invoice_id", "invoice_amount", "due_date"]
+    if "status" in invoices.columns:
+        invoice_columns.append("status")
+
+    balances = invoices[invoice_columns].copy()
     balances["invoice_amount"] = pd.to_numeric(
         balances["invoice_amount"], errors="coerce"
     ).fillna(0)
@@ -116,6 +120,76 @@ def calculate_issue_counts(issues: pd.DataFrame) -> dict[str, int]:
         "medium_severity_issues": int((issues["severity"] == "Medium").sum()),
         "total_issues": len(issues),
     }
+
+
+def build_receivables_monitor(
+    invoices: pd.DataFrame,
+    payments: pd.DataFrame,
+    as_of_date: str | date | pd.Timestamp | None = None,
+) -> pd.DataFrame:
+    """Build the invoice-level table used by the receivables dashboard section."""
+    comparison_date = (
+        pd.Timestamp.today().normalize()
+        if as_of_date is None
+        else pd.Timestamp(as_of_date).normalize()
+    )
+    monitor = calculate_invoice_balances(invoices, payments).rename(
+        columns={"payments_received": "amount_paid"}
+    )
+
+    if "status" not in monitor.columns:
+        monitor["status"] = ""
+
+    overdue_days = (comparison_date - monitor["due_date"]).dt.days
+    is_overdue = monitor["outstanding_balance"].gt(0) & overdue_days.gt(0)
+    monitor["days_overdue"] = overdue_days.where(is_overdue, 0).fillna(0).astype(int)
+
+    # Keep unpaid invoices at the top, with the oldest overdue items first.
+    monitor["_is_outstanding"] = monitor["outstanding_balance"].gt(0)
+    monitor = monitor.sort_values(
+        ["_is_outstanding", "days_overdue"], ascending=[False, False], kind="stable"
+    ).drop(columns="_is_outstanding")
+
+    return monitor[
+        [
+            "invoice_id",
+            "due_date",
+            "invoice_amount",
+            "amount_paid",
+            "outstanding_balance",
+            "days_overdue",
+            "status",
+        ]
+    ].reset_index(drop=True)
+
+
+def build_project_budget_monitor(projects: pd.DataFrame) -> pd.DataFrame:
+    """Build the project budget table used by the dashboard."""
+    monitor = projects[
+        ["project_id", "project_name", "owner", "budget", "actual_cost", "status"]
+    ].copy()
+    monitor["budget"] = pd.to_numeric(monitor["budget"], errors="coerce")
+    monitor["actual_cost"] = pd.to_numeric(monitor["actual_cost"], errors="coerce")
+    monitor["variance"] = monitor["actual_cost"] - monitor["budget"]
+
+    # A zero budget has no meaningful percentage variance.
+    valid_budget = monitor["budget"].gt(0)
+    monitor["variance_percentage"] = (
+        monitor["variance"].div(monitor["budget"]).mul(100).where(valid_budget)
+    )
+
+    return monitor[
+        [
+            "project_id",
+            "project_name",
+            "owner",
+            "budget",
+            "actual_cost",
+            "variance",
+            "variance_percentage",
+            "status",
+        ]
+    ]
 
 
 def calculate_kpis(

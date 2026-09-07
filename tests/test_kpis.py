@@ -3,6 +3,8 @@
 import pandas as pd
 
 from src.kpis import (
+    build_project_budget_monitor,
+    build_receivables_monitor,
     calculate_data_quality_score,
     calculate_issue_counts,
     calculate_outstanding_receivables,
@@ -14,11 +16,11 @@ def make_invoice_data() -> tuple[pd.DataFrame, pd.DataFrame]:
     """Create invoices with partial, excessive, and missing payments."""
     invoices = pd.DataFrame(
         [
-            ["INV-001", 1000, "2026-08-01"],
-            ["INV-002", 500, "2026-10-01"],
-            ["INV-003", 300, "2026-10-15"],
+            ["INV-001", 1000, "2026-08-01", "Partially Paid"],
+            ["INV-002", 500, "2026-10-01", "Paid"],
+            ["INV-003", 300, "2026-10-15", "Unpaid"],
         ],
-        columns=["invoice_id", "invoice_amount", "due_date"],
+        columns=["invoice_id", "invoice_amount", "due_date", "status"],
     )
     payments = pd.DataFrame(
         [
@@ -93,3 +95,44 @@ def test_severity_counts() -> None:
         "medium_severity_issues": 2,
         "total_issues": 5,
     }
+
+
+def test_receivables_monitor_calculates_and_prioritizes_open_invoices() -> None:
+    invoices, payments = make_invoice_data()
+
+    monitor = build_receivables_monitor(
+        invoices, payments, as_of_date="2026-09-07"
+    )
+
+    assert list(monitor.columns) == [
+        "invoice_id",
+        "due_date",
+        "invoice_amount",
+        "amount_paid",
+        "outstanding_balance",
+        "days_overdue",
+        "status",
+    ]
+    assert monitor["invoice_id"].tolist() == ["INV-001", "INV-003", "INV-002"]
+    assert monitor.loc[0, "amount_paid"] == 500
+    assert monitor.loc[0, "outstanding_balance"] == 500
+    assert monitor.loc[0, "days_overdue"] == 37
+
+
+def test_project_budget_monitor_calculates_variance() -> None:
+    projects = pd.DataFrame(
+        [["PRJ-001", "Example Project", "Project Owner", 1000, 1250, "At Risk"]],
+        columns=[
+            "project_id",
+            "project_name",
+            "owner",
+            "budget",
+            "actual_cost",
+            "status",
+        ],
+    )
+
+    monitor = build_project_budget_monitor(projects)
+
+    assert monitor.loc[0, "variance"] == 250
+    assert monitor.loc[0, "variance_percentage"] == 25
